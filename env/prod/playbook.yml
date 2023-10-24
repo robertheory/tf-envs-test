@@ -1,0 +1,41 @@
+- hosts: terraform-ansible
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Node.js and npm
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Verify Node.js and npm installation
+      command: node -v
+      register: node_version
+      changed_when: false
+      failed_when: false
+      ignore_errors: yes
+
+    - name: Install Angular CLI
+      command: npm install -g @angular/cli
+
+    - name: Clone the repository
+      ansible.builtin.git:
+        repo: https://github.com/robertheory/memoteca.git
+        dest: /home/ubuntu/app
+        version: master
+        force: yes
+
+    - name: Install Fake API Dependencies
+      command: npm install
+      args:
+        chdir: /home/ubuntu/app/backend
+
+    - name: Install Frontend Dependencies
+      command: npm install
+      args:
+        chdir: /home/ubuntu/app
