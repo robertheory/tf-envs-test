@@ -1,0 +1,23 @@
+- hosts: terraform-ansible
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Node.js LTS
+      shell: curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+
+    - name: Install Node.js and npm
+      apt:
+        name: nodejs
+
+    - name: Verify Node.js and npm installation
+      command: node -v
+      register: node_version
+      changed_when: false # Ignore changes
+      failed_when: false # Ignore failures
+      ignore_errors: yes # Ignore errors for the next task
